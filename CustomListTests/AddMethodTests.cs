@@ -32,7 +32,7 @@ public class AddMethodTests
 
 
         //ASSERT
-        Assert.AreEqual(1, myList.Count[0]);
+        Assert.AreEqual(1, myList[0]);
     }
 
     [TestMethod]
@@ -48,7 +48,7 @@ public class AddMethodTests
 
 
         //ASSERT
-        Assert.AreEqual(2, myList.Count[1]);
+        Assert.AreEqual(2, myList[1]);
     }
 
     [TestMethod]
@@ -67,7 +67,7 @@ public class AddMethodTests
 
 
         //ASSERT
-        Assert.AreEqual(i, myList[i]); //Use capacity method to check number of elements the list can contain
+        Assert.AreEqual(8, myList.Capacity); //Use capacity method to check number of elements the list can contain
     }
 
     [TestMethod]
