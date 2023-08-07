@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,121 +9,186 @@ namespace CustomList
 {
     public class CustomList<T>
     {
-        //Member Variables (HAS A)
-        private T[] items;
-        private int count;
-        private int capacity;
-        private int Count { get { return count; } }
-        public int Capacity { get { return capacity; } set { capacity = value; } }
+        public T[] list;
+        public T[] combinedList;
 
-        // Indexer returns or sets the corresponding item from the internal array 
+        //Member variables
+        public int Count { get { return count; } private set { count = value; } }
+        private int count;
+        public int Capacity { get { return capacity; } private set { capacity = value; } }
+        private int capacity;
+        public int indexPosition;
+
         public T this[int i]
         {
             get
             {
-                return items[i];
+                if (i < 0 || i >= count)
+                {
+                    throw new ArgumentOutOfRangeException("Out of range...");
+                }
+                return list[i];
             }
             set
             {
-                items[i] = value;
+                if (i >= 0 || i < count)
+                {
+                    list[i] = value;
+                }
             }
         }
 
         //Constructor
         public CustomList()
         {
-            capacity = 4;
             count = 0;
-            items = new T[capacity];
+            indexPosition = 0;
+            capacity = 2;
+            list = new T[capacity];
         }
-
-
-        //Member Methods (CAN DO)
-        public void Add(T item)
+        
+        public static CustomList<T> operator +(CustomList<T> listOne, CustomList<T> listTwo)
         {
-            if (count >= capacity)
+            CustomList<T> AddedList = new CustomList<T>();
+            AddedList.AddLists(listOne);
+            AddedList.AddLists(listTwo);
+            return AddedList;
+        }
+        public void AddLists(CustomList<T> list)
+        {
+            for (int i = 0; i < list.count; i++)
             {
-                capacity += 4;
-                T[] newArray = new T[capacity];
-
-                
-                for (int i = 0; i < count; i++)
-                {
-                    newArray[i] = items[i];
-                }
-
-                items = newArray;
-                items[count] = item;
-                count++;
-            }
-            else
-            {
-                items[count] = item;
-                count++;
+                Add(list[i]);
             }
         }
 
-
-        public bool Remove(T item)
+        
+        public static CustomList<T> operator -(CustomList<T> listOne, CustomList<T> listTwo)
+        {
+            for (int i = 0; i < listOne.count; i++)
+            {
+                for (int j = 0; j < listTwo.count; j++)
+                {
+                    if (listOne[i].Equals(listTwo[j]))
+                    {
+                        listOne.Remove(listOne[i]);
+                    }
+                }
+            }
+            return listOne;
+        }
+        //ADD METHOD
+        public void Add(T value)
+        {
+            AddValueToArray(value);
+            if (count == capacity)
+            {
+                T[] temporaryArray = DoubleCapacityOfArray();
+                CopyItemsToArray(temporaryArray);
+            }
+        }
+        public void AddValueToArray(T value)
+        {
+            list[indexPosition] = value;
+            IncrementArray();
+        }
+        public T[] DoubleCapacityOfArray()
+        {
+            T[] temporaryCustomList;
+            int newArraylength = capacity * 2;
+            capacity = newArraylength;
+            temporaryCustomList = new T[capacity];
+            return temporaryCustomList;
+        }
+        public T[] CopyItemsToArray(T[] temporaryCustomList)
         {
             for (int i = 0; i < count; i++)
             {
-                if (items[i].Equals(item))
+                temporaryCustomList[i] = list[i];
+            }
+            return list = temporaryCustomList;
+        }
+        public void IncrementArray()
+        {
+            indexPosition++;
+            count++;
+        }
+
+        //REMOVE METHOD
+        public void Remove(T value)
+        {
+            int valueIfFound = SearchArray(value, list);
+
+            if (valueIfFound >= 0)
+            {
+                ShiftListItems(valueIfFound);
+                count--;
+            }
+        }
+        public int SearchArray(T inputValue, T[] listClass)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                T arrayItemValue = listClass[i];
+                if (inputValue.Equals(arrayItemValue))
                 {
-                    count--;
-                    ShiftMyArray(i);
-                    return true;
+                    return i;
                 }
             }
-            return false;
+            return -1;
         }
-
-
-        private void ShiftMyArray(int currentIndex)
+        public void ShiftListItems(int valueFound)
         {
-            for (int i = currentIndex; i < count; i++)
+            for (int i = valueFound; i < Count; i++)
             {
-                items[i] = items[i + 1];
+                list[i] = list[i + 1];
             }
-            items[count + 1] = default(T);
         }
 
-
+        //TOSTRING METHOD
         public override string ToString()
         {
-            string resultString = "";
-            if (count != 0)
-                for (int i = 0; i < count; i++)
-                    resultString = ConvertValuesToString();
-
-            return resultString;
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < Count; i++)
+            {
+                stringBuilder.Append(list[i]);
+            }
+            return Convert.ToString(stringBuilder);
         }
-
-
-        private string ConvertValuesToString()
+        public void ConvertCustomTListToStringList()
         {
-            string myString = "";
+            CustomList<string> stringList = new CustomList<string>();
             for (int i = 0; i < count; i++)
             {
-                myString += items[i];
+                stringList.Add($"{list[i]}");
             }
-            return myString;
-
-
         }
 
-
-
-        public static CustomList<T> operator +(CustomList<T> firstList, CustomList<T> secondList)
+        //ZIPPER METHOD
+        public CustomList<T> Zipper(CustomList<T> listOne, CustomList<T> listTwo)
         {
-            //returns a single CustomList<T> that contains all items from firstList and all items from secondList 
-            return null;
+            CustomList<T> list = new CustomList<T>();
+            list.Capacity = listOne.count + listTwo.count;
+            for (int i = 0; i < listOne.count + listTwo.count; i++)
+            {
+                if (listOne.count > i)
+                {
+                    Add(listOne[i]);
+                }
+                if (listTwo.count > i)
+                {
+                    Add(listTwo[i]);
+                }
+            }
+            return list;
         }
-
-        public static CustomList<T> operator -(CustomList<T> firstList, CustomList<T> secondList)
+        public IEnumerator GetEnumerator()
         {
-            //returns a single CustomList<T> with all items from firstList, EXCEPT any items that also appear in secondList
-            return null;
+            for (int i = 0; i < Count; i++)
+            {
+                yield return list[i];
+            }
+            yield return "Complete";
         }
 
 

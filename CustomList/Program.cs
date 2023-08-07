@@ -4,11 +4,10 @@
     {
         static void Main(string[] args)
         {
-            //CustomList<strings> myList = new CustomList();
+            CustomList<string> myList = new CustomList<string>();
 
-            //Console.WriteLine(myList.Count);
-            //Console.WriteLine(myList.Capacity);
-            //Console.WriteLine(myList[4]);
+            myList.Add("o");
+            myList.Add("Pearl");
         }
     }
 }
